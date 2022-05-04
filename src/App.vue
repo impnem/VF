@@ -1,10 +1,11 @@
 <template>
   <div id="app">
+    추가한 부분입니다.<br />
     <nav>
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
     </nav>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
