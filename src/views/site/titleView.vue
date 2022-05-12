@@ -37,8 +37,6 @@ export default {
         await this.$firebaseDB.update(this.$firebaseDB.ref(db, 'site/'), {
           title: this.text
         })
-      } catch (e) {
-        console.log(e.message)
       } finally {
         this.dialog = false
       }

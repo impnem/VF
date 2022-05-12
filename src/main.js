@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import './plugins/firebase' // 그냥 쓴다고 하면 from 없이 사용
+import './error'
 
 Vue.config.productionTip = false
 
