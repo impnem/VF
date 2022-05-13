@@ -24,19 +24,50 @@
           <v-list-item-content>
             <v-list-item-title v-text="item.title"></v-list-item-title>
           </v-list-item-content>
+          <v-list-item-action>
+            <v-btn @click="openDialogItem(i)" icon><v-icon>mdi-pencil</v-icon></v-btn>
+          </v-list-item-action>
         </template>
 
         <v-list-item
-          v-for="subItem in item.subItems"
-          :key="subItem.title"
+          v-for="(subItem, j) in item.subItems"
+          :key="j"
           :to="subItem.to"
         >
           <v-list-item-content>
             <v-list-item-title v-text="subItem.title"></v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item>
+          <v-list-item-icon>
+            <v-icon>mdi-plus</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>서브 추가하기</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list-group>
+      <v-list-item @click="openDialogItem(-1)">
+        <v-list-item-icon>
+          <v-icon>mdi-plus</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>추가하기</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
+    <v-dialog v-model="dialogItem" max-width="400">
+      <v-card>
+        <v-card-title>
+          수정하기
+          <v-spacer></v-spacer>
+          <v-btn icon @click="saveItem"><v-icon>mdi-content-save</v-icon></v-btn>
+        </v-card-title>
+        <v-card-text>
+          <v-text-field v-model="formItem.title"></v-text-field>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -45,7 +76,42 @@ export default {
   props: ['items'],
   data () {
     return {
-
+      dialogItem: false,
+      dialogSubItem: false,
+      formItem: {
+        icon: '',
+        title: ''
+      },
+      selectedItemIndex: -1 // 제어용 변수 추가
+    }
+  },
+  methods: {
+    openDialogItem (index) {
+      this.selectedItemIndex = index
+      this.dialogItem = true
+      if (index < 0) {
+        this.formItem.title = '' // 새로 메뉴를 만들다면 비워두기
+      } else {
+        this.formItem.title = this.items[index].title // 기존 메뉴라면 메뉴 이름 가져오기
+      }
+    },
+    saveItem () {
+      if (this.selectedItemIndex < 0) {
+        this.items.push(this.formItem) // 현재 작성한 내용을 추가
+      } else {
+        this.items[this.selectedItemIndex] = this.formItem // 현재 내용 가져오기
+      }
+      this.save()
+    },
+    async save () {
+      try {
+        const db = this.$firebaseDB.getDatabase()
+        await this.$firebaseDB.update(this.$firebaseDB.ref(db, 'site/'), {
+          menu: this.items
+        })
+      } finally {
+        this.dialogItem = false // 저장 후 창 닫기
+      }
     }
   }
 }
